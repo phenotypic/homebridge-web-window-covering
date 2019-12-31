@@ -17,8 +17,11 @@ function WebWindowCovering (log, config) {
   this.apiroute = config.apiroute
   this.pollInterval = config.pollInterval || 300
 
+  this.horizontalTilt = config.horizontalTilt || false
+  this.verticalTilt = config.verticalTilt || false
+
   this.port = config.port || 2000
-  this.requestArray = ['currentPosition', 'targetPosition', 'positionState']
+  this.requestArray = ['currentPosition', 'targetPosition', 'positionState', 'targetHorizontalTiltAngle', 'currentHorizontalTiltAngle', 'targetVerticalTiltAngle', 'currentVerticalTiltAngle']
 
   this.autoReset = config.autoReset || false
   this.autoResetDelay = config.autoResetDelay || 5
@@ -100,6 +103,18 @@ WebWindowCovering.prototype = {
         this.log('Updated currentPosition to: %s', json.currentPosition)
         this.service.getCharacteristic(Characteristic.TargetPosition).updateValue(json.targetPosition)
         this.log('Updated targetPosition to: %s', json.targetPosition)
+        if (this.verticalTilt) {
+          this.service.getCharacteristic(Characteristic.CurrentVerticalTiltAngle).updateValue(json.currentVerticalTiltAngle)
+          this.log('Updated currentVerticalTiltAngle to: %s', json.currentVerticalTiltAngle)
+          this.service.getCharacteristic(Characteristic.TargetVerticalTiltAngle).updateValue(json.targetVerticalTiltAngle)
+          this.log('Updated targetVerticalTiltAngle to: %s', json.targetVerticalTiltAngle)
+        }
+        if (this.horizontalTilt) {
+          this.service.getCharacteristic(Characteristic.CurrentHorizontalTiltAngle).updateValue(json.currentHorizontalTiltAngle)
+          this.log('Updated currentVerticalTiltAngle to: %s', json.currentHorizontalTiltAngle)
+          this.service.getCharacteristic(Characteristic.TargetHorizontalTiltAngle).updateValue(json.targetHorizontalTiltAngle)
+          this.log('Updated targetVerticalTiltAngle to: %s', json.targetHorizontalTiltAngle)
+        }
         callback()
       }
     }.bind(this))
@@ -119,6 +134,22 @@ WebWindowCovering.prototype = {
         this.service.getCharacteristic(Characteristic.TargetPosition).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         break
+      case 'targetHorizontalTiltAngle':
+        this.service.getCharacteristic(Characteristic.TargetHorizontalTiltAngle).updateValue(value)
+        this.log('Updated %s to: %s', characteristic, value)
+        break
+      case 'currentHorizontalTiltAngle':
+        this.service.getCharacteristic(Characteristic.CurrentHorizontalTiltAngle).updateValue(value)
+        this.log('Updated %s to: %s', characteristic, value)
+        break
+      case 'targetVerticalTiltAngle':
+        this.service.getCharacteristic(Characteristic.TargetVerticalTiltAngle).updateValue(value)
+        this.log('Updated %s to: %s', characteristic, value)
+        break
+      case 'currentVerticalTiltAngle':
+        this.service.getCharacteristic(Characteristic.CurrentVerticalTiltAngle).updateValue(value)
+        this.log('Updated %s to: %s', characteristic, value)
+        break
       case 'obstructionDetected':
         this.service.getCharacteristic(Characteristic.ObstructionDetected).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
@@ -132,15 +163,45 @@ WebWindowCovering.prototype = {
   },
 
   setTargetPosition: function (value, callback) {
-    var url = this.apiroute + '/setState/' + value
-    this.log.debug('Setting state: %s', url)
+    var url = this.apiroute + '/setTargetPosition/' + value
+    this.log.debug('Setting targetPosition: %s', url)
 
     this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
       if (error) {
-        this.log.warn('Error setting state: %s', error.message)
+        this.log.warn('Error setting targetPosition: %s', error.message)
         callback(error)
       } else {
-        this.log('Set state to %s', value)
+        this.log('Set targetPosition to %s', value)
+        callback()
+      }
+    }.bind(this))
+  },
+
+  setTargetHorizontalTiltAngle: function (value, callback) {
+    var url = this.apiroute + '/setState/' + value
+    this.log.debug('Setting targetHorizontalTiltAngle: %s', url)
+
+    this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
+      if (error) {
+        this.log.warn('Error setting targetHorizontalTiltAngle: %s', error.message)
+        callback(error)
+      } else {
+        this.log('Set targetHorizontalTiltAngle to %s', value)
+        callback()
+      }
+    }.bind(this))
+  },
+
+  setTargetVerticalTiltAngle: function (value, callback) {
+    var url = this.apiroute + '/setTargetVerticalTiltAngle/' + value
+    this.log.debug('Setting targetVerticalTiltAngle: %s', url)
+
+    this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
+      if (error) {
+        this.log.warn('Error setting targetVerticalTiltAngle: %s', error.message)
+        callback(error)
+      } else {
+        this.log('Set targetVerticalTiltAngle to %s', value)
         callback()
       }
     }.bind(this))
@@ -165,6 +226,18 @@ WebWindowCovering.prototype = {
     this.service
       .getCharacteristic(Characteristic.TargetPosition)
       .on('set', this.setTargetPosition.bind(this))
+
+    if (this.horizontalTilt) {
+      this.service
+        .getCharacteristic(Characteristic.TargetHorizontalTiltAngle)
+        .on('set', this.setTargetHorizontalTiltAngle.bind(this))
+    }
+
+    if (this.verticalTilt) {
+      this.service
+        .getCharacteristic(Characteristic.TargetVerticalTiltAngle)
+        .on('set', this.setTargetVerticalTiltAngle.bind(this))
+    }
 
     this._getStatus(function () {})
 
