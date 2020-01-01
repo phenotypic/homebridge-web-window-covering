@@ -34,6 +34,8 @@ This [homebridge](https://github.com/nfarina/homebridge) plugin exposes a web-ba
 ### Optional fields
 | Key | Description | Default |
 | --- | --- | --- |
+| `horizontalTilt` | Whether to expose horizontal tilt as a characteristic | `false` |
+| `verticalTilt` | Whether to expose vertical tilt as a characteristic | `false` |
 | `autoReset` | Whether obstruction detection should automatically change the state back to `0` after being triggered | `false` |
 | `autoResetDelay` | Time (in seconds) until the obstruction detection will automatically reset (if enabled) | `5` |
 
@@ -87,6 +89,28 @@ Your API should be able to:
 6. Update `obstructionDetected` when an obstruction is detected by messaging the listen server (should notify `0` after obstruction moves unless `autoReset` is enabled):
 ```
 /obstructionDetected/INT_VALUE_0_TO_1
+```
+
+### Optional
+
+1. If `horizontalTilt` is enabled, update `currentHorizontalTiltAngle` as the angle changes:
+```
+/currentHorizontalTiltAngle/INT_VALUE_-90_TO_90
+```
+
+2. If `horizontalTilt` is enabled, update `targetHorizontalTiltAngle` following a manual override by messaging the listen server:
+```
+/targetHorizontalTiltAngle/INT_VALUE_-90_TO_90
+```
+
+3. If `verticalTilt` is enabled, update `currentVerticalTiltAngle` as the angle changes:
+```
+/currentVerticalTiltAngle/INT_VALUE_-90_TO_90
+```
+
+4. If `verticalTilt` is enabled, update `targetVerticalTiltAngle` following a manual override by messaging the listen server:
+```
+/targetVerticalTiltAngle/INT_VALUE_-90_TO_90
 ```
 
 ## PositionState Key
