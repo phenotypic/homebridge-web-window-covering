@@ -98,22 +98,22 @@ WebWindowCovering.prototype = {
         this.log.debug('Device response: %s', responseBody)
         var json = JSON.parse(responseBody)
         this.service.getCharacteristic(Characteristic.PositionState).updateValue(json.positionState)
-        this.log('Updated positionState to: %s', json.positionState)
+        this.log.debug('Updated positionState to: %s', json.positionState)
         this.service.getCharacteristic(Characteristic.CurrentPosition).updateValue(json.currentPosition)
-        this.log('Updated currentPosition to: %s', json.currentPosition)
+        this.log.debug('Updated currentPosition to: %s', json.currentPosition)
         this.service.getCharacteristic(Characteristic.TargetPosition).updateValue(json.targetPosition)
-        this.log('Updated targetPosition to: %s', json.targetPosition)
+        this.log.debug('Updated targetPosition to: %s', json.targetPosition)
         if (this.verticalTilt) {
           this.service.getCharacteristic(Characteristic.CurrentVerticalTiltAngle).updateValue(json.currentVerticalTiltAngle)
-          this.log('Updated currentVerticalTiltAngle to: %s', json.currentVerticalTiltAngle)
+          this.log.debug('Updated currentVerticalTiltAngle to: %s', json.currentVerticalTiltAngle)
           this.service.getCharacteristic(Characteristic.TargetVerticalTiltAngle).updateValue(json.targetVerticalTiltAngle)
-          this.log('Updated targetVerticalTiltAngle to: %s', json.targetVerticalTiltAngle)
+          this.log.debug('Updated targetVerticalTiltAngle to: %s', json.targetVerticalTiltAngle)
         }
         if (this.horizontalTilt) {
           this.service.getCharacteristic(Characteristic.CurrentHorizontalTiltAngle).updateValue(json.currentHorizontalTiltAngle)
-          this.log('Updated currentVerticalTiltAngle to: %s', json.currentHorizontalTiltAngle)
+          this.log.debug('Updated currentVerticalTiltAngle to: %s', json.currentHorizontalTiltAngle)
           this.service.getCharacteristic(Characteristic.TargetHorizontalTiltAngle).updateValue(json.targetHorizontalTiltAngle)
-          this.log('Updated targetVerticalTiltAngle to: %s', json.targetHorizontalTiltAngle)
+          this.log.debug('Updated targetVerticalTiltAngle to: %s', json.targetHorizontalTiltAngle)
         }
         callback()
       }
