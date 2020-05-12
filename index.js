@@ -44,13 +44,12 @@ function WebWindowCovering (log, config) {
   }
 
   this.server = http.createServer(function (request, response) {
-    var parts = request.url.split('/')
-    var partOne = parts[parts.length - 2]
-    var partTwo = parts[parts.length - 1]
-    if (parts.length === 3 && this.requestArray.includes(partOne)) {
-      this.log('Handling request: %s', request.url)
+    var baseURL = 'http://' + request.headers.host + '/'
+    var url = new URL(request.url, baseURL)
+    if (this.requestArray.includes(url.pathname.substr(1))) {
+      this.log.debug('Handling request')
       response.end('Handling request')
-      this._httpHandler(partOne, partTwo)
+      this._httpHandler(url.pathname.substr(1), url.searchParams.get('value'))
     } else {
       this.log.warn('Invalid request: %s', request.url)
       response.end('Invalid request')
@@ -163,7 +162,7 @@ WebWindowCovering.prototype = {
   },
 
   setTargetPosition: function (value, callback) {
-    var url = this.apiroute + '/setTargetPosition/' + value
+    var url = this.apiroute + '/setTargetPosition?value=' + value
     this.log.debug('Setting targetPosition: %s', url)
 
     this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
@@ -178,7 +177,7 @@ WebWindowCovering.prototype = {
   },
 
   setTargetHorizontalTiltAngle: function (value, callback) {
-    var url = this.apiroute + '/setState/' + value
+    var url = this.apiroute + '/setState?value=' + value
     this.log.debug('Setting targetHorizontalTiltAngle: %s', url)
 
     this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
@@ -193,7 +192,7 @@ WebWindowCovering.prototype = {
   },
 
   setTargetVerticalTiltAngle: function (value, callback) {
-    var url = this.apiroute + '/setTargetVerticalTiltAngle/' + value
+    var url = this.apiroute + '/setTargetVerticalTiltAngle?value=' + value
     this.log.debug('Setting targetVerticalTiltAngle: %s', url)
 
     this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
