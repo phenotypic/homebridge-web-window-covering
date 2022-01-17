@@ -1,4 +1,4 @@
-var Service, Characteristic
+let Service, Characteristic
 const packageJson = require('./package.json')
 const request = require('request')
 const ip = require('ip')
@@ -44,12 +44,16 @@ function WebWindowCovering (log, config) {
   }
 
   this.server = http.createServer(function (request, response) {
-    var baseURL = 'http://' + request.headers.host + '/'
-    var url = new URL(request.url, baseURL)
+    const baseURL = 'http://' + request.headers.host + '/'
+    const url = new URL(request.url, baseURL)
     if (this.requestArray.includes(url.pathname.substr(1))) {
-      this.log.debug('Handling request')
-      response.end('Handling request')
-      this._httpHandler(url.pathname.substr(1), url.searchParams.get('value'))
+      try {
+        this.log.debug('Handling request')
+        response.end('Handling request')
+        this._httpHandler(url.pathname.substr(1), url.searchParams.get('value'))
+      } catch (e) {
+        this.log.warn('Error parsing request: %s', e.message)
+      }
     } else {
       this.log.warn('Invalid request: %s', request.url)
       response.end('Invalid request')
@@ -85,7 +89,7 @@ WebWindowCovering.prototype = {
   },
 
   _getStatus: function (callback) {
-    var url = this.apiroute + '/status'
+    const url = this.apiroute + '/status'
     this.log.debug('Getting status: %s', url)
 
     this._httpRequest(url, '', 'GET', function (error, response, responseBody) {
@@ -96,7 +100,7 @@ WebWindowCovering.prototype = {
       } else {
         this.log.debug('Device response: %s', responseBody)
         try {
-          var json = JSON.parse(responseBody)
+          const json = JSON.parse(responseBody)
           this.service.getCharacteristic(Characteristic.PositionState).updateValue(json.positionState)
           this.log.debug('Updated positionState to: %s', json.positionState)
           this.service.getCharacteristic(Characteristic.CurrentPosition).updateValue(json.currentPosition)
@@ -125,48 +129,57 @@ WebWindowCovering.prototype = {
 
   _httpHandler: function (characteristic, value) {
     switch (characteristic) {
-      case 'positionState':
+      case 'positionState': {
         this.service.getCharacteristic(Characteristic.PositionState).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         break
-      case 'currentPosition':
+      }
+      case 'currentPosition': {
         this.service.getCharacteristic(Characteristic.CurrentPosition).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         break
-      case 'targetPosition':
+      }
+      case 'targetPosition': {
         this.service.getCharacteristic(Characteristic.TargetPosition).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         break
-      case 'targetHorizontalTiltAngle':
+      }
+      case 'targetHorizontalTiltAngle': {
         this.service.getCharacteristic(Characteristic.TargetHorizontalTiltAngle).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         break
-      case 'currentHorizontalTiltAngle':
+      }
+      case 'currentHorizontalTiltAngle': {
         this.service.getCharacteristic(Characteristic.CurrentHorizontalTiltAngle).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         break
-      case 'targetVerticalTiltAngle':
+      }
+      case 'targetVerticalTiltAngle': {
         this.service.getCharacteristic(Characteristic.TargetVerticalTiltAngle).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         break
-      case 'currentVerticalTiltAngle':
+      }
+      case 'currentVerticalTiltAngle': {
         this.service.getCharacteristic(Characteristic.CurrentVerticalTiltAngle).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         break
-      case 'obstructionDetected':
+      }
+      case 'obstructionDetected': {
         this.service.getCharacteristic(Characteristic.ObstructionDetected).updateValue(value)
         this.log('Updated %s to: %s', characteristic, value)
         if (parseInt(value) === 1 && this.autoReset) {
           this.autoResetFunction()
         }
         break
-      default:
+      }
+      default: {
         this.log.warn('Unknown characteristic "%s" with value "%s"', characteristic, value)
+      }
     }
   },
 
   setTargetPosition: function (value, callback) {
-    var url = this.apiroute + '/setTargetPosition?value=' + value
+    const url = this.apiroute + '/setTargetPosition?value=' + value
     this.log.debug('Setting targetPosition: %s', url)
 
     this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
@@ -181,7 +194,7 @@ WebWindowCovering.prototype = {
   },
 
   setTargetHorizontalTiltAngle: function (value, callback) {
-    var url = this.apiroute + '/setState?value=' + value
+    const url = this.apiroute + '/setState?value=' + value
     this.log.debug('Setting targetHorizontalTiltAngle: %s', url)
 
     this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
@@ -196,7 +209,7 @@ WebWindowCovering.prototype = {
   },
 
   setTargetVerticalTiltAngle: function (value, callback) {
-    var url = this.apiroute + '/setTargetVerticalTiltAngle?value=' + value
+    const url = this.apiroute + '/setTargetVerticalTiltAngle?value=' + value
     this.log.debug('Setting targetVerticalTiltAngle: %s', url)
 
     this._httpRequest(url, '', this.http_method, function (error, response, responseBody) {
